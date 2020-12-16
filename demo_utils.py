@@ -9,6 +9,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import time
 
+# speakers
+karinTime = 1
+sandroTime = 1
+
+# needed to multiply frames by time
+timeFrameMultiplier = 0.065
+
 _default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 _my_colors = np.array([
     [0, 127, 70],
@@ -117,7 +124,7 @@ def plot_projections(embeds, speakers, ax=None, colors=None, markers=None, legen
     return projs
     
 
-def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_time=True):
+def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_time=True):    
     fig, ax = plt.subplots()
     lines = [ax.plot([], [], label=name)[0] for name in similarity_dict.keys()]
     text = ax.text(0, 0, "", fontsize=10)
@@ -140,6 +147,8 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
     ref_time = timer()
     
     def update(i):
+        global sandroTime
+        global karinTime
         # Crop plot
         crop = (max(i - crop_range // 2, 0), i + crop_range // 2)
         ax.set_xlim(i - crop_range // 2, crop[1])
@@ -155,10 +164,25 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
         if similarity > 0.75:
             message = "Speaker: %s (confident)" % name
             color = _default_colors[best]
-            print(name + "" + str("time delta")) # print the name of the speaker every update
+            # print name and frametimestamp each update
+            if name == "Sandro Botz, Moderator":
+                sandroTime += 1
+                print(sandroTime)
+            if name == "Karin Keller-Sutter, Bundesrätin":
+                karinTime += 1
+                print(karinTime)
+            print(name) # print the name of the speaker every update
         elif similarity > 0.65:
             message = "Speaker: %s (uncertain)" % name
             color = _default_colors[best]
+            # print name and frametimestamp each update
+            if name == "Sandro Botz, Moderator":
+                sandroTime += 1
+                print(sandroTime)
+            if name == "Karin Keller-Sutter, Bundesrätin":
+                karinTime += 1
+                print(karinTime)
+            print(name) # print the name of the speaker every update
         else:
             message = "Unknown/No speaker"
             color = "black"
@@ -182,6 +206,12 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
                         repeat=False, interval=1)
     play_wav(wav, blocking=False)
     plt.show()
+
+    # print total amount of talked seconds each candidate
+    global karinTime
+    global sandroTime
+    print(karinTime * timeFrameMultiplier)
+    print(sandroTime * timeFrameMultiplier)
 
 
 def plot_embedding_as_heatmap(embed, ax=None, title="", shape=None, color_range=(0, 0.30)):
