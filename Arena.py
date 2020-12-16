@@ -21,7 +21,7 @@ wav = preprocess_wav(wav_fpath)
 # Cut some segments from single speakers as reference audio
 # 1 min Version:
 segments = [[00, 11], [14, 30] ]
-speaker_names = ["Sandro Botz Moderator", "Karin Keller-Sutter, Bundesrätin"]
+speaker_names = ["Sandro Botz, Moderator", "Karin Keller-Sutter, Bundesrätin"]
 speaker_wavs = [wav[int(s[0] * sampling_rate):int(s[1] * sampling_rate)] for s in segments]
   
     
