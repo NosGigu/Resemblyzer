@@ -7,6 +7,7 @@ from umap import UMAP
 from sys import stderr
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import time
 
 _default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 _my_colors = np.array([
@@ -116,7 +117,7 @@ def plot_projections(embeds, speakers, ax=None, colors=None, markers=None, legen
     return projs
     
 
-def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_time=False):
+def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_time=True):
     fig, ax = plt.subplots()
     lines = [ax.plot([], [], label=name)[0] for name in similarity_dict.keys()]
     text = ax.text(0, 0, "", fontsize=10)
@@ -154,6 +155,7 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
         if similarity > 0.75:
             message = "Speaker: %s (confident)" % name
             color = _default_colors[best]
+            print(name + "" + str("time delta")) # print the name of the speaker every update
         elif similarity > 0.65:
             message = "Speaker: %s (uncertain)" % name
             color = _default_colors[best]
