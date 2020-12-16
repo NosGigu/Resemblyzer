@@ -128,7 +128,7 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
             ax.set_xlabel("Time (seconds)")
         else:
             ax.set_xticks([])
-        ax.set_title("Diarization")
+        ax.set_title("Diarization by Patrik, Dejan & Robin")
         ax.legend(loc="lower right")
         return lines + [text]
     
