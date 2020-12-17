@@ -14,7 +14,7 @@ karinTime = 0
 sandroTime = 0
 
 # needed to multiply frames by time
-timeFrameMultiplier = 0.065
+timeFrameMultiplier = 0.0625
 
 _default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 _my_colors = np.array([
