@@ -1,5 +1,5 @@
 from resemblyzer import preprocess_wav, VoiceEncoder
-from demo_utils import *
+from demo_utils_1min import *
 from pathlib import Path
 
 

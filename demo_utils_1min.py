@@ -1,17 +1,17 @@
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.animation import FuncAnimation
 from resemblyzer import sampling_rate
-from matplotlib import cm
+from matplotlib import cm, colors
 from time import sleep, perf_counter as timer
 from umap import UMAP
 from sys import stderr
 import matplotlib.pyplot as plt
 import numpy as np
-from datetime import time
+import datetime
 
 # speakers
-karinTime = 1
-sandroTime = 1
+karinTime = 0
+sandroTime = 0
 
 # needed to multiply frames by time
 timeFrameMultiplier = 0.065
@@ -125,7 +125,7 @@ def plot_projections(embeds, speakers, ax=None, colors=None, markers=None, legen
     
 
 def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_time=True):    
-    fig, ax = plt.subplots()
+    fig, (ax, pie) = plt.subplots(1, 2)
     lines = [ax.plot([], [], label=name)[0] for name in similarity_dict.keys()]
     text = ax.text(0, 0, "", fontsize=10)
     
@@ -136,9 +136,11 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
             ax.set_xlabel("Time (seconds)")
         else:
             ax.set_xticks([])
-        ax.set_title("Diarization by Patrik, Dejan & Robin")
+        fig.suptitle("Diarization by Patrik, Dejan & Robin", fontsize=14, fontweight='bold')
+        ax.set_title("Speaker Diarization")
         ax.legend(loc="lower right")
         return lines + [text]
+        
     
     times = [((s.start + s.stop) / 2) / sampling_rate for s in wav_splits]
     rate = 1 / (times[1] - times[0])
@@ -149,6 +151,8 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
     def update(i):
         global sandroTime
         global karinTime
+        labels = 'Sandro Botz, Moderator', 'Karin Keller-Sutter, Bundesrätin'
+        nums = [sandroTime, karinTime]
         # Crop plot
         crop = (max(i - crop_range // 2, 0), i + crop_range // 2)
         ax.set_xlim(i - crop_range // 2, crop[1])
@@ -161,6 +165,22 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
         similarities = [s[i] for s in similarity_dict.values()]
         best = np.argmax(similarities)
         name, similarity = list(similarity_dict.keys())[best], similarities[best]
+
+
+
+        pie
+        pie.clear()
+        pie.axis('equal')
+        pie.pie(nums, autopct='%1.1f%%', shadow=True, startangle=140)
+        pie.set_title("Sprechverteilung")
+        # Place a legend to the right of this smaller subplot.
+        pie.legend(bbox_to_anchor=(0.5, 0.95), loc='upper left', borderaxespad=0., labels=labels)
+        pie.text(-1, -1.3, 'Total Talk Time:', fontsize=15)
+        pie.text(-1, -1.5, 'Sandro Botz: ' + str(datetime.timedelta(seconds=(sandroTime * timeFrameMultiplier)))[:-4] + " Sekunden", style='italic', bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 10})
+        pie.text(-1, -1.7, 'Karin Keller-Sutter: ' + str(datetime.timedelta(seconds=(karinTime * timeFrameMultiplier)))[:-4] + " Sekunden", style='italic', bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 10})
+        
+        
+        
         if similarity > 0.75:
             message = "Speaker: %s (confident)" % name
             color = _default_colors[best]
@@ -202,9 +222,14 @@ def interactive_diarization(similarity_dict, wav, wav_splits, x_crop=5, show_tim
             print("Animation is delayed further than 200ms!", file=stderr)
         return lines + [text]
     
+        # #Pie Chart
+        
+
     ani = FuncAnimation(fig, update, frames=len(wav_splits), init_func=init, blit=not show_time,
                         repeat=False, interval=1)
     play_wav(wav, blocking=False)
+
+
     plt.show()
 
     # print total amount of talked seconds each candidate
